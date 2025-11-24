@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Resultados</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Resultados</h1>
+
+      {% if resultado.es_exacta %}
+        <div class="resultado">
+          <h2>✓ La ecuación ES exacta</h2>
+          <p>
+            <strong>Solución:</strong> {{ resultado.solucion }}
+          </p>
+
+          <h3>Pasos:</h3>
+          <ul>
+            <li>M(x,y) = {{ resultado.pasos.M }}</li>
+            <li>N(x,y) = {{ resultado.pasos.N }}</li>
+            <li>∂M/∂y = {{ resultado.pasos.dM_dy }}</li>
+            <li>∂N/∂x = {{ resultado.pasos.dN_dx }}</li>
+          </ul>
+        </div>
+      {% else %}
+        <div class="error">{{ resultado.mensaje }}</div>
+      {% endif %}
+
+      <a href="/">← Resolver otra ecuación</a>
+    </div>
+  </body>
+</html>

@@ -1,34 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Resultados</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resultados - Solver Ecuaciones Diferenciales</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+  </head>
+  <body>
     <div class="container">
-        <h1>Resultados</h1>
-        
-        {% if resultado.es_exacta %}
-            <div class="resultado">
-                <h2>✓ La ecuación ES exacta</h2>
-                <p><strong>Solución:</strong> {{ resultado.solucion }}</p>
-                
-                <h3>Pasos:</h3>
-                <ul>
-                    <li>M(x,y) = {{ resultado.pasos.M }}</li>
-                    <li>N(x,y) = {{ resultado.pasos.N }}</li>
-                    <li>∂M/∂y = {{ resultado.pasos.dM_dy }}</li>
-                    <li>∂N/∂x = {{ resultado.pasos.dN_dx }}</li>
-                </ul>
+      <h1>Resultados</h1>
+
+      {% if resultado.es_exacta %}
+        <div class="resultado-exitoso">
+          <div class="icono-exito">✓</div>
+          <h2>La ecuación ES exacta</h2>
+
+          <div class="solucion-box">
+            <h3>Solución General:</h3>
+            <p class="solucion">{{ resultado.solucion }}</p>
+          </div>
+
+          <div class="pasos-box">
+            <h3>Proceso de Solución:</h3>
+            <div class="paso">
+              <span class="paso-label">M(x,y) =</span>
+              <span class="paso-valor">{{ resultado.pasos.M }}</span>
             </div>
-        {% else %}
-            <div class="error">
-                {{ resultado.mensaje }}
+            <div class="paso">
+              <span class="paso-label">N(x,y) =</span>
+              <span class="paso-valor">{{ resultado.pasos.N }}</span>
             </div>
-        {% endif %}
-        
-        <a href="/">← Resolver otra ecuación</a>
+            <div class="paso">
+              <span class="paso-label">∂M/∂y =</span>
+              <span class="paso-valor">{{ resultado.pasos.dM_dy }}</span>
+            </div>
+            <div class="paso">
+              <span class="paso-label">∂N/∂x =</span>
+              <span class="paso-valor">{{ resultado.pasos.dN_dx }}</span>
+            </div>
+            <div class="paso">
+              <span class="paso-label">f(x,y) =</span>
+              <span class="paso-valor">{{ resultado.pasos.get('f(x,y)', 'N/A') }}</span>
+            </div>
+            <div class="paso">
+              <span class="paso-label">g'(y) =</span>
+              <span class="paso-valor">{{ resultado.pasos.get("g'(y)", 'N/A') }}</span>
+            </div>
+            <div class="paso">
+              <span class="paso-label">g(y) =</span>
+              <span class="paso-valor">{{ resultado.pasos.get('g(y)', 'N/A') }}</span>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="resultado-error">
+          <div class="icono-error">✗</div>
+          <h2>{{ resultado.mensaje }}</h2>
+
+          {% if resultado.detalles %}
+            <div class="detalles-box">
+              <h3>Detalles:</h3>
+              <div class="paso">
+                <span class="paso-label">∂M/∂y =</span>
+                <span class="paso-valor">{{ resultado.detalles.dM_dy }}</span>
+              </div>
+              <div class="paso">
+                <span class="paso-label">∂N/∂x =</span>
+                <span class="paso-valor">{{ resultado.detalles.dN_dx }}</span>
+              </div>
+              <div class="paso error">
+                <span class="paso-label">Diferencia =</span>
+                <span class="paso-valor">{{ resultado.detalles.diferencia }}</span>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <a href="/" class="btn-volver">← Resolver otra ecuación</a>
     </div>
-</body>
+  </body>
 </html>
