@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solver Ecuaciones Diferenciales</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Resolver Ecuación Diferencial Exacta</h1>
+      <p class="formato">Formato: M(x,y)dx + N(x,y)dy = 0</p>
+      <p class="nota">
+        💡 Usa <strong>**</strong> para potencias (ejemplo: x**2 para x²)
+      </p>
+
+      <form action="/resolver" method="POST">
+        <div class="form-group">
+          <label>M(x,y):</label>
+          <input type="text" id="inputM" name="M" placeholder="Ej: 2*x*y + 1" required />
+          <button type="button" class="btn-toggle-teclado" data-target="inputM">⌨️ Desplegar Teclado</button>
+          <div class="teclado-matematico" id="tecladoM" data-target="inputM">
+            <button type="button" class="btn-tecla">x</button>
+            <button type="button" class="btn-tecla">y</button>
+            <button type="button" class="btn-tecla">+</button>
+            <button type="button" class="btn-tecla">-</button>
+            <button type="button" class="btn-tecla">*</button>
+            <button type="button" class="btn-tecla">/</button>
+            <button type="button" class="btn-tecla">**2</button>
+            <button type="button" class="btn-tecla">**3</button>
+            <button type="button" class="btn-tecla">**</button>
+            <button type="button" class="btn-tecla">(</button>
+            <button type="button" class="btn-tecla">)</button>
+            <button type="button" class="btn-tecla especial">sin()</button>
+            <button type="button" class="btn-tecla especial">cos()</button>
+            <button type="button" class="btn-tecla especial">exp()</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>N(x,y):</label>
+          <input type="text" id="inputN" name="N" placeholder="Ej: x**2 + 3*y**2" required />
+          <button type="button" class="btn-toggle-teclado" data-target="inputN">⌨️ Desplegar Teclado</button>
+          <div class="teclado-matematico" id="tecladoN" data-target="inputN">
+            <button type="button" class="btn-tecla">x</button>
+            <button type="button" class="btn-tecla">y</button>
+            <button type="button" class="btn-tecla">+</button>
+            <button type="button" class="btn-tecla">-</button>
+            <button type="button" class="btn-tecla">*</button>
+            <button type="button" class="btn-tecla">/</button>
+            <button type="button" class="btn-tecla">**2</button>
+            <button type="button" class="btn-tecla">**3</button>
+            <button type="button" class="btn-tecla">**</button>
+            <button type="button" class="btn-tecla">(</button>
+            <button type="button" class="btn-tecla">)</button>
+            <button type="button" class="btn-tecla especial">sin()</button>
+            <button type="button" class="btn-tecla especial">cos()</button>
+            <button type="button" class="btn-tecla especial">exp()</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-resolver">Resolver</button>
+      </form>
+
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/teclado.js') }}"></script>
+  </body>
+</html>

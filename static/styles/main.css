@@ -1,0 +1,315 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin: 20px 0;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #5568d3;
+}
+
+.error {
+    background: #fee;
+    border-left: 4px solid #f44;
+    padding: 15px;
+    margin: 20px 0;
+    color: #c33;
+}
+
+.resultado {
+    background: #efe;
+    border-left: 4px solid #4a4;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+h1 {
+    color: #1a1a2e;
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.formato {
+    text-align: center;
+    color: #666;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.nota {
+    text-align: center;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+    font-size: 14px;
+}
+
+.nota strong {
+    color: #664d03;
+}
+
+.form-group {
+    margin: 30px 0;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #333;
+    font-size: 18px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 18px;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s;
+    background: #f8f9fa;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Botón para desplegar teclado */
+.btn-toggle-teclado {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    transition: all 0.3s;
+}
+
+.btn-toggle-teclado:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.btn-toggle-teclado.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* Teclado Matemático */
+.teclado-matematico {
+    display: none;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px solid #dee2e6;
+    animation: slideDown 0.3s ease-out;
+}
+
+.teclado-matematico.show {
+    display: grid;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-tecla {
+    padding: 16px 12px;
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    color: #333;
+}
+
+.btn-tecla:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-tecla:active {
+    transform: translateY(-1px);
+}
+
+.btn-tecla.especial {
+    background: linear-gradient(135deg, #e7f3ff 0%, #cfe7ff 100%);
+    color: #0066cc;
+    border-color: #b3d9ff;
+}
+
+.btn-tecla.especial:hover {
+    background: #0066cc;
+    color: white;
+    border-color: #0066cc;
+}
+
+.btn-resolver {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-resolver:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
+.btn-resolver:active {
+    transform: translateY(-1px);
+}
+
+.error {
+    background: #fee;
+    border-left: 4px solid #f44;
+    padding: 15px;
+    margin: 20px 0;
+    color: #c33;
+    border-radius: 8px;
+}
+
+.resultado {
+    background: #efe;
+    border-left: 4px solid #4a4;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .teclado-matematico {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .container {
+        padding: 25px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+}
