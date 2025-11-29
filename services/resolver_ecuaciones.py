@@ -7,56 +7,87 @@ def limpiar_expresion(expr):
     # asegurar string
     expr = str(expr)
 
-    # Normalizar potencias: ^ -> **
-    expr = expr.replace("^", "**")
-
-    # Eliminar dx y dy (p. ej. cuando el usuario copia M(x,y)dx)
-    expr = expr.replace("dx", "").replace("dy", "")
-
-    # Eliminar espacios redundantes
+    # Eliminar espacios redundantes PRIMERO
     expr = expr.replace(" ", "")
 
-    # Lista de funciones de sympy a proteger (puedes ampliar)
+    # Eliminar dx y dy (cuando el usuario copia M(x,y)dx)
+    expr = expr.replace("dx", "").replace("dy", "")
+
+    # Lista de funciones de sympy a proteger
     funciones = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan',
                  'sinh', 'cosh', 'tanh', 'exp', 'log', 'sqrt', 'Abs']
 
-    # Proteger funciones: reemplazar 'sin(' por '__fn_sin__(' para no romperlas al insertar '*'
+    # Proteger funciones: reemplazar 'sin(' por '__fn_sin__('
     placeholders = {}
     for fn in funciones:
-        pattern = r'\b' + fn + r'(?=\()'   # función seguida de '('
+        pattern = r'\b' + fn + r'(?=\()'
         placeholder = f'__fn_{fn}__'
-        # usar sub para reemplazar solo cuando va seguido de '('
         expr, n = re.subn(pattern, placeholder, expr)
         if n:
             placeholders[placeholder] = fn
 
-    # Ahora insertar multiplicaciones donde hacen falta
-    # 1) número seguido de letra o '('   ->  2x -> 2*x   ,  2(x+y) -> 2*(x+y)
-    expr = re.sub(r'(?<!\*)(?<!\*\*)(\d+)(?=[A-Za-z(])', r'\1*', expr)
+    # ===== MANEJO ESPECIAL DE POTENCIAS ^  =====
+    # Proteger expresiones con ^ para procesarlas al final
+    # Patrón: captura cosas como x^2, y^3, (x+y)^2, sin(x)^2
+    potencias_placeholders = {}
+    contador_pot = 0
+    
+    # Patrón mejorado: variable/paréntesis/función seguida de ^exponente
+    patron_potencia = r'([A-Za-z_]+\([^)]*\)|\([^)]+\)|[A-Za-z])\^([0-9]+|\([^)]+\))'
+    
+    def reemplazar_potencia(match):
+        nonlocal contador_pot
+        base = match.group(1)
+        exponente = match.group(2)
+        placeholder = f'__POT{contador_pot}__'
+        potencias_placeholders[placeholder] = f'{base}**{exponente}'
+        contador_pot += 1
+        return placeholder
+    
+    # Aplicar repetidamente hasta procesar todas las potencias anidadas
+    while '^' in expr:
+        expr_anterior = expr
+        expr = re.sub(patron_potencia, reemplazar_potencia, expr)
+        if expr == expr_anterior:  # Evitar bucle infinito
+            break
 
-    # 2) letra o dígito o ')' seguida de '(' -> x(y) -> x*(y)   ;  ) (  -> )*(  ;  2( -> 2*(
-    expr = re.sub(r'([A-Za-z0-9\)])(?=\()', r'\1*', expr)
+    # ===== INSERTAR MULTIPLICACIONES IMPLÍCITAS =====
+    
+    # 1) número seguido de letra o '(' -> 2x -> 2*x, 2(x+y) -> 2*(x+y)
+    expr = re.sub(r'(\d)(?=[A-Za-z_(])', r'\1*', expr)
 
-    # 3) 
-    #expr = re.sub(r'(?<!\*)([A-Za-z])(?=\d(?!\*))', r'\1*', expr)
+    # 2) ')' seguido de '(' o letra -> )(  -> )*(, )x -> )*x
+    expr = re.sub(r'(\))(?=[\(A-Za-z_])', r'\1*', expr)
 
-    # 4) letra seguida de letra -> xy -> x*y
-    #    Aplicar REPETIDAMENTE hasta que no queden letras juntas
-    while re.search(r'([A-Za-z])([A-Za-z])', expr):
-        expr = re.sub(r'([A-Za-z])([A-Za-z])', r'\1*\2', expr)
+    # 3) letra/placeholder seguido de '(' -> x( -> x*(
+    expr = re.sub(r'([A-Za-z_])(?=\()', r'\1*', expr)
+    
+    # 4) letra seguida de letra -> xy -> x*y (REPETIDAMENTE)
+    # Pero EXCLUIR placeholders tipo __POT0__
+    while True:
+        expr_antes = expr
+        # Solo aplicar entre letras que NO sean parte de __PALABRA__
+        expr = re.sub(r'(?<!_)([a-z])(?=[a-z])(?!_)', r'\1*', expr, flags=re.IGNORECASE)
+        if expr == expr_antes:
+            break
 
-    # 5) Reducir dobles '*' si se produjeron (por seguridad)
-    expr = re.sub(r'\*+', '*', expr)
+    # 5) Limpiar asteriscos dobles accidentales
+    expr = re.sub(r'\*{2,}', '**', expr)  # mantener ** como potencia
+    expr = re.sub(r'(?<!\*)\*(?!\*)\*(?!\*)', '*', expr)  # triple * -> *
 
-    # Restaurar placeholders de funciones (volver a 'sin', 'cos', etc.)
+    # ===== RESTAURAR POTENCIAS =====
+    for placeholder, potencia in potencias_placeholders.items():
+        expr = expr.replace(placeholder, potencia)
+
+    # ===== RESTAURAR FUNCIONES =====
     for placeholder, fn in placeholders.items():
         expr = expr.replace(placeholder, fn)
 
-    # Evitar errores triviales: si queda algo como '+*' o '*+' limpialo
+    # Limpiar operadores mal formados
     expr = expr.replace('+*', '+').replace('*+', '+')
     expr = expr.replace('-*', '-').replace('*-', '-')
+    expr = expr.replace('/*', '/').replace('*/', '/')
 
-    # Retornar la expresión limpia
     return expr
 
 
@@ -91,9 +122,7 @@ def resolver_ecuacion_exacta(ecuacion):
         }
     
     # Verificar si es exacta
-    # Calcular derivadas parciales primero de M respecto a "Y"
     dM_dy = diff(M, y)
-    # Luego de N respecto a "X"
     dN_dx = diff(N, x)
     
     # 🔍 DEBUG: Imprime las derivadas
@@ -114,16 +143,10 @@ def resolver_ecuacion_exacta(ecuacion):
     
     # Resolver (integrar M respecto a x)
     f = integrate(M, x)
-    # luego de esto vamos a obtener una ecuación con una función g(y) pendiente por determinar
     
-    # Encontrar g(y) derivando y comparando con N
-    # primero derivamos f respecto a y
+    # Encontrar g(y)
     df_dy = diff(f, y)
-    
-    # luego restamos N - df/dy para encontrar g'(y)
     g_prime = simplify(N - df_dy)
-    
-    # integramos g'(y) respecto a y para encontrar g(y)
     g = integrate(g_prime, y)
     
     solucion = f + g
