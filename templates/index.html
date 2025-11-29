@@ -11,7 +11,7 @@
       <h1>Resolver Ecuación Diferencial Exacta</h1>
       <p class="formato">Formato: M(x,y)dx + N(x,y)dy = 0</p>
       <p class="nota">
-        💡 Usa <strong>**</strong> para potencias (ejemplo: x^2 para x²)
+        💡 Usa <strong>**</strong> para potencias (ejemplo: x**2 para x²)
       </p>
 
       <form action="/resolver" method="POST">
@@ -39,7 +39,7 @@
 
         <div class="form-group">
           <label>N(x,y):</label>
-          <input type="text" id="inputN" name="N" placeholder="Ej: x^2 + 3*y^2" required />
+          <input type="text" id="inputN" name="N" placeholder="Ej: x**2 + 3*y**2" required />
           <button type="button" class="btn-toggle-teclado" data-target="inputN">⌨️ Desplegar Teclado</button>
           <div class="teclado-matematico" id="tecladoN" data-target="inputN">
             <button type="button" class="btn-tecla">x</button>

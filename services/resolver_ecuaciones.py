@@ -7,81 +7,53 @@ def limpiar_expresion(expr):
     # asegurar string
     expr = str(expr)
 
-    # Eliminar espacios redundantes PRIMERO
+    # Eliminar espacios
     expr = expr.replace(" ", "")
 
-    # Eliminar dx y dy (cuando el usuario copia M(x,y)dx)
+    # Eliminar dx y dy
     expr = expr.replace("dx", "").replace("dy", "")
 
     # Lista de funciones de sympy a proteger
     funciones = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan',
                  'sinh', 'cosh', 'tanh', 'exp', 'log', 'sqrt', 'Abs']
 
-    # Proteger funciones: reemplazar 'sin(' por '__fn_sin__('
-    placeholders = {}
-    for fn in funciones:
-        pattern = r'\b' + fn + r'(?=\()'
-        placeholder = f'__fn_{fn}__'
-        expr, n = re.subn(pattern, placeholder, expr)
-        if n:
-            placeholders[placeholder] = fn
-
-    # ===== MANEJO ESPECIAL DE POTENCIAS ^  =====
-    # Proteger expresiones con ^ para procesarlas al final
-    # Patrón: captura cosas como x^2, y^3, (x+y)^2, sin(x)^2
-    potencias_placeholders = {}
-    contador_pot = 0
-    
-    # Patrón mejorado: variable/paréntesis/función seguida de ^exponente
-    patron_potencia = r'([A-Za-z_]+\([^)]*\)|\([^)]+\)|[A-Za-z])\^([0-9]+|\([^)]+\))'
-    
-    def reemplazar_potencia(match):
-        nonlocal contador_pot
-        base = match.group(1)
-        exponente = match.group(2)
-        placeholder = f'__POT{contador_pot}__'
-        potencias_placeholders[placeholder] = f'{base}**{exponente}'
-        contador_pot += 1
-        return placeholder
-    
-    # Aplicar repetidamente hasta procesar todas las potencias anidadas
-    while '^' in expr:
-        expr_anterior = expr
-        expr = re.sub(patron_potencia, reemplazar_potencia, expr)
-        if expr == expr_anterior:  # Evitar bucle infinito
-            break
+    # Proteger funciones: reemplazar temporalmente
+    for i, fn in enumerate(funciones):
+        # Reemplazar 'sin(' por un marcador único que no contenga letras
+        expr = expr.replace(f'{fn}(', f'@F{i}@(')
 
     # ===== INSERTAR MULTIPLICACIONES IMPLÍCITAS =====
     
-    # 1) número seguido de letra o '(' -> 2x -> 2*x, 2(x+y) -> 2*(x+y)
-    expr = re.sub(r'(\d)(?=[A-Za-z_(])', r'\1*', expr)
+    # 1) número seguido de letra o '(' o '@' -> 2x -> 2*x
+    expr = re.sub(r'(\d)(?=[A-Za-z_(@])', r'\1*', expr)
 
-    # 2) ')' seguido de '(' o letra -> )(  -> )*(, )x -> )*x
+    # 2) ')' seguido de '(' o letra -> )(  -> )*(
     expr = re.sub(r'(\))(?=[\(A-Za-z_])', r'\1*', expr)
 
-    # 3) letra/placeholder seguido de '(' -> x( -> x*(
-    expr = re.sub(r'([A-Za-z_])(?=\()', r'\1*', expr)
+    # 3) letra seguida de '(' -> x( -> x*(
+    expr = re.sub(r'([A-Za-z])(?=\()', r'\1*', expr)
     
     # 4) letra seguida de letra -> xy -> x*y (REPETIDAMENTE)
-    # Pero EXCLUIR placeholders tipo __POT0__
-    while True:
+    # Esta es la clave: solo aplicar entre letras normales
+    max_iterations = 50
+    for _ in range(max_iterations):
         expr_antes = expr
-        # Solo aplicar entre letras que NO sean parte de __PALABRA__
-        expr = re.sub(r'(?<!_)([a-z])(?=[a-z])(?!_)', r'\1*', expr, flags=re.IGNORECASE)
+        # Solo entre a-z y A-Z, ignorando @
+        expr = re.sub(r'([a-zA-Z])([a-zA-Z])', r'\1*\2', expr)
         if expr == expr_antes:
             break
 
-    # 5) Limpiar asteriscos dobles accidentales
-    expr = re.sub(r'\*{2,}', '**', expr)  # mantener ** como potencia
-    expr = re.sub(r'(?<!\*)\*(?!\*)\*(?!\*)', '*', expr)  # triple * -> *
-
-    # ===== RESTAURAR POTENCIAS =====
-    for placeholder, potencia in potencias_placeholders.items():
-        expr = expr.replace(placeholder, potencia)
+    # 5) Limpiar múltiples asteriscos (pero mantener **)
+    # Primero proteger **
+    expr = expr.replace('**', '§§§')
+    # Quitar * múltiples
+    expr = re.sub(r'\*+', '*', expr)
+    # Restaurar **
+    expr = expr.replace('§§§', '**')
 
     # ===== RESTAURAR FUNCIONES =====
-    for placeholder, fn in placeholders.items():
-        expr = expr.replace(placeholder, fn)
+    for i, fn in enumerate(funciones):
+        expr = expr.replace(f'@F{i}@(', f'{fn}(')
 
     # Limpiar operadores mal formados
     expr = expr.replace('+*', '+').replace('*+', '+')
